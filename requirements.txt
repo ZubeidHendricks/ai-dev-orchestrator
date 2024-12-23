@@ -1,0 +1,11 @@
+crewai>=0.1.25
+langchain>=0.0.325
+llama-cpp-python[cuda]
+PyGithub
+pydantic>=2.0.0
+flask
+celery
+redis
+pytest
+bandit
+pylint
