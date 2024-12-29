@@ -6,6 +6,7 @@ on:
 
 jobs:
   ai-development:
+    if: contains(github.event.issue.labels.*.name, 'ai-development')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -15,3 +16,15 @@ jobs:
     - run: |
         pip install -r requirements.txt
         python src/main.py
+    - name: Add comment to issue
+      if: success()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'AI Development workflow completed successfully!'
+          })
