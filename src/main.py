@@ -19,15 +19,12 @@ def main():
     llm_service = LLMService()
     
     # Get issue details from GitHub context
-    github_context = os.environ.get('GITHUB_CONTEXT')
-    if github_context:
-        try:
-            context = json.loads(github_context)
-            task_description = context.get('event', {}).get('issue', {}).get('body', 'Create a generic utility')
-        except Exception as e:
-            print(f"Error parsing GitHub context: {e}")
-            task_description = "Create a generic utility"
-    else:
+    github_context = os.environ.get('GITHUB_CONTEXT', '{}')
+    try:
+        context = json.loads(github_context)
+        task_description = context.get('event', {}).get('issue', {}).get('body', 'Create a generic utility')
+    except Exception as e:
+        print(f"Error parsing GitHub context: {e}")
         task_description = "Create a generic utility"
     
     # Generate code
