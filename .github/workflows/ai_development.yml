@@ -13,11 +13,46 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - run: |
+    - name: Install dependencies
+      run: |
         pip install -r requirements.txt
-        python src/main.py
+        pip install groq requests PyGithub
+    - name: Trigger Project Orchestrator
+      env:
+        GHUB_TOKEN: ${{secrets.GHUB_TOKEN}}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      run: |
+        # Clone Project Orchestrator
+        git clone https://github.com/ZubeidHendricks/project-orchestrator.git
+        cd project-orchestrator
+        
+        # Extract issue details
+        ISSUE_TITLE=$(echo '${{ github.event.issue.title }}' | sed 's/ /-/g' | tr '[:upper:]' '[:lower:]')
+        ISSUE_BODY='${{ github.event.issue.body }}'
+        
+        # Python script to interact with Project Orchestrator
+        python3 - << EOL
+        import os
+        import sys
+        sys.path.append('.')
+        
+        from src.master_project_orchestrator import MasterProjectOrchestrator
+        
+        token = os.environ.get('GHUB_TOKEN')
+        orchestrator = MasterProjectOrchestrator(token)
+        
+        # Create project based on issue details
+        orchestrator.create_new_project(
+            project_name="$ISSUE_TITLE",
+            repositories=[f"{ISSUE_TITLE}-backend", f"{ISSUE_TITLE}-frontend"],
+            objectives=[
+                "Initial Project Setup",
+                "Design Core Architecture",
+                "Implement Basic Functionality"
+            ]
+        )
+        EOL
     - name: Add comment to issue
-      if: success()
       uses: actions/github-script@v6
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
@@ -26,5 +61,5 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'AI Development workflow completed successfully!'
+            body: 'Project Orchestrator has been triggered! New repositories and objectives have been created.'
           })
