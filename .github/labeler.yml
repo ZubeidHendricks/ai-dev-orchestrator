@@ -1,0 +1,9 @@
+ai-development:
+  - 'feat/**/*'
+  - 'feature/**/*'
+
+ai-generated:
+  - 'generated/**/*'
+
+needs-review:
+  - '**/*'
