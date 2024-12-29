@@ -21,11 +21,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install groq
     
     - name: Run AI Dev Orchestrator
       env:
         GROQ_API_KEY: ${{ secrets.GROQ }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_CONTEXT: ${{ toJson(github) }}
       run: |
         python src/main.py
