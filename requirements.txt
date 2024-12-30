@@ -1,7 +1,4 @@
-groq>=0.3.0
-PyGithub>=2.1.1
-pytest>=7.4.3
-fastapi>=0.104.1
-pydantic>=2.5.2
-python-dotenv>=1.0.0
-requests>=2.31.0
+groq
+PyGithub
+python-dotenv
+requests
