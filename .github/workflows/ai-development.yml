@@ -41,17 +41,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
-      - name: Download LLM model
-        run: |
-          mkdir -p models
-          wget -O models/llama-2-70b-chat.gguf \
-          https://huggingface.co/TheBloke/Llama-2-70B-Chat-GGUF/resolve/main/llama-2-70b-chat.Q4_K_M.gguf
-          
       - name: Analyze requirements
         env:
           GITHUB_TOKEN: ${{ secrets.GHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          LLAMA_MODEL_PATH: models/llama-2-70b-chat.gguf
         run: python src/handlers/task_analyzer.py
 
   generate-code:
@@ -73,7 +67,7 @@ jobs:
       - name: Generate code
         env:
           GITHUB_TOKEN: ${{ secrets.GHUB_TOKEN }}
-          LLAMA_MODEL_PATH: models/llama-2-70b-chat.gguf
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python src/main.py
         
       - name: Create Pull Request
