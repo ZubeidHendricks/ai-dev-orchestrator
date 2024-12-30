@@ -1,0 +1,12 @@
+using System;
+using System.Threading.Tasks;
+using BlazorPOS.Core.Interfaces;
+using BlazorPOS.Core.Models;
+
+namespace BlazorPOS.Core.Services
+{
+    public class {{serviceName}} : I{{serviceName}}
+    {
+        {{{serviceImplementation}}}
+    }
+}

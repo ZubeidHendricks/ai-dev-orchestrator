@@ -1,0 +1,17 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+
+namespace BlazorPOS.Infrastructure.Migrations
+{
+    public partial class {{migrationName}} : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            {{{upOperations}}}
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            {{{downOperations}}}
+        }
+    }
+}

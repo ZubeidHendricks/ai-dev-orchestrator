@@ -1,0 +1,11 @@
+using Bunit;
+using Xunit;
+using BlazorPOS.Web.Components;
+
+namespace BlazorPOS.Tests.Components
+{
+    public class {{componentName}}Tests : TestContext
+    {
+        {{{testMethods}}}
+    }
+}
