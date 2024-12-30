@@ -1,32 +1,19 @@
 name: AI Development Pipeline
 
 on:
-  issues:
-    types: [opened, labeled]
   workflow_dispatch:
     inputs:
+      repository:
+        description: 'Repository to monitor (owner/repo)'
+        required: true
       issue_number:
         description: 'Issue number to process'
         required: true
+  repository_dispatch:
+    types: [ai-development-task]
 
 jobs:
-  check-label:
-    runs-on: ubuntu-latest
-    outputs:
-      is-ai-task: ${{ steps.check.outputs.is_ai_task }}
-    steps:
-      - id: check
-        if: github.event_name == 'issues'
-        run: |
-          if [[ "${{ contains(github.event.issue.labels.*.name, 'ai-development') }}" == "true" ]]; then
-            echo "is_ai_task=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_ai_task=false" >> $GITHUB_OUTPUT
-          fi
-
   analyze-task:
-    needs: check-label
-    if: needs.check-label.outputs.is-ai-task == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -45,7 +32,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          TARGET_REPO: ${{ github.event.client_payload.repository || github.event.inputs.repository }}
+          ISSUE_NUMBER: ${{ github.event.client_payload.issue_number || github.event.inputs.issue_number }}
         run: python src/handlers/task_analyzer.py
 
   generate-code:
@@ -68,16 +56,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TARGET_REPO: ${{ github.event.client_payload.repository || github.event.inputs.repository }}
         run: python src/main.py
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GHUB_TOKEN }}
-          commit-message: "AI-generated code for issue #${{ github.event.issue.number }}"
-          title: "Feature: ${{ github.event.issue.title }}"
+          repository: ${{ github.event.client_payload.repository || github.event.inputs.repository }}
+          commit-message: "AI-generated code for issue #${{ github.event.client_payload.issue_number || github.event.inputs.issue_number }}"
+          title: "Feature: AI Implementation"
           body: |
-            Automated PR for issue #${{ github.event.issue.number }}
+            Automated PR for issue #${{ github.event.client_payload.issue_number || github.event.inputs.issue_number }}
             
             Generated code includes:
             - Implementation
@@ -85,6 +75,6 @@ jobs:
             - Documentation
             
             Please review the changes.
-          branch: feature/issue-${{ github.event.issue.number }}
+          branch: feature/ai-implementation
           base: main
           labels: ai-generated, needs-review
